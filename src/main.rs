@@ -24,9 +24,13 @@ struct Cli {
     #[arg(value_enum)]
     command: Command,
 
-    /// Input (Generate) or Output (Tally) file
+    /// Input (Generate)
     #[arg(short, long)]
-    file: PathBuf,
+    input: PathBuf,
+
+    /// Output (Tally)
+    #[arg(short, long)]
+    output: PathBuf,
 }
 
 fn main() {
@@ -34,10 +38,10 @@ fn main() {
 
     match cli.command {
         Command::Generate => {
-            generate_input(cli.file);
+            generate_input(cli.input);
         }
         Command::Tally => {
-            process_tally(cli.file);
+            process_tally(cli.input, cli.output);
             println!("tally!");
         }
     }

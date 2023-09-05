@@ -9,14 +9,14 @@ use crate::voting::{
     DecodedVoteChoice,
 };
 
-pub fn process_tally(file: PathBuf) {
-    let input = read_input(file);
+pub fn process_tally(input: PathBuf, output: PathBuf) {
+    let input_json = read_input(input);
 
-    let cr = count_votes(&input);
+    let cr = count_votes(&input_json);
 
     let json_data = serde_json::to_string(&cr).expect("Failed to serialize contest result");
 
-    let filename = "output.json";
+    let filename = output.to_str().expect("Failed to read output file");
     fs::write(filename, json_data).expect("Unable to write input data into file");
 
     println!("Generated {filename}");
