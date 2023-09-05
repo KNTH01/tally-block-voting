@@ -68,7 +68,7 @@ impl Dummy<Faker> for ContestChoice {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct DecodedContestVote {
     is_explicit_invalid: bool,
     choices: Vec<DecodedVoteChoice>,
@@ -123,7 +123,7 @@ impl DecodedVoteChoice {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct ContestResult {
     contest: Contest,
     total_valid_votes: i64,
@@ -137,7 +137,7 @@ pub struct ContestResult {
     winners: Vec<ContestChoice>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct ContestChoiceResult {
     contest_result: ContestResult,
     contest_choice: ContestChoice,

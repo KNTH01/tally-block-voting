@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 use clap::{Parser, ValueEnum};
 
-use crate::input_generator::generate_input;
+use crate::{input_generator::generate_input, tally::process_tally};
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 enum Command {
@@ -37,6 +37,7 @@ fn main() {
             generate_input(cli.file);
         }
         Command::Tally => {
+            process_tally(cli.file);
             println!("tally!");
         }
     }

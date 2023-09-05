@@ -4,7 +4,7 @@ use rand::Rng;
 use serde::Serialize;
 use std::{fs, path::PathBuf};
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 struct InputJson {
     contest: Contest,
     votes: Vec<DecodedContestVote>,
