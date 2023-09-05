@@ -2,10 +2,11 @@ use fake::{
     faker::{internet::en::SafeEmail, lorem::en::Words, name::en::Name},
     Dummy, Fake, Faker,
 };
+use rand::seq::SliceRandom;
 use rand::Rng;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Contest {
     id: i64,
     description: String,
@@ -36,7 +37,19 @@ impl Dummy<Faker> for Contest {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+impl Contest {
+    pub fn get_district_magnitude(&self) -> Option<u64> {
+        if self.tally_type == "plurality-at-large"
+            && (self.num_winners == self.min_choices && self.num_winners == self.max_choices)
+        {
+            return Some(self.num_winners as u64);
+        }
+
+        None
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ContestChoice {
     id: i64,
     text: String,
@@ -59,16 +72,56 @@ impl Dummy<Faker> for ContestChoice {
 pub struct DecodedContestVote {
     is_explicit_invalid: bool,
     choices: Vec<DecodedVoteChoice>,
+    #[serde(serialize_with = "DecodedContestVote::to_id")]
     contest: Contest,
+}
+
+impl DecodedContestVote {
+    pub fn dummy(contest: Contest, district_magnitude: u64) -> Self {
+        Self {
+            is_explicit_invalid: false,
+            choices: (0..district_magnitude)
+                .map(|_| DecodedVoteChoice::dummy(&contest.choices))
+                .collect(),
+            contest,
+        }
+    }
+
+    pub fn to_id<S>(contest: &Contest, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_i64(contest.id)
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DecodedVoteChoice {
+    #[serde(serialize_with = "DecodedVoteChoice::to_id")]
     // The choice that was made
     contest_choice: ContestChoice,
-    // THe number of votes that were assigned, in plurality at large this is always
+    // The number of votes that were assigned, in plurality at large this is always
     // 0 or 1
     selected: u64,
+}
+
+impl DecodedVoteChoice {
+    pub fn dummy(contest_choices: &Vec<ContestChoice>) -> Self {
+        Self {
+            contest_choice: contest_choices
+                .choose(&mut rand::thread_rng())
+                .unwrap()
+                .clone(),
+            selected: 1,
+        }
+    }
+
+    pub fn to_id<S>(contest_choice: &ContestChoice, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_i64(contest_choice.id)
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
