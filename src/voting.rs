@@ -8,13 +8,13 @@ use serde::{Deserialize, Serialize, Serializer};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Contest {
-    id: i64,
-    description: String,
-    tally_type: String,
-    num_winners: i64,
-    min_choices: i64,
-    max_choices: i64,
-    choices: Vec<ContestChoice>,
+    pub id: i64,
+    pub description: String,
+    pub tally_type: String,
+    pub num_winners: i64,
+    pub min_choices: i64,
+    pub max_choices: i64,
+    pub choices: Vec<ContestChoice>,
 }
 
 impl Dummy<Faker> for Contest {
@@ -51,7 +51,7 @@ impl Contest {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ContestChoice {
-    id: i64,
+    pub id: i64,
     text: String,
     urls: Vec<String>,
 }
@@ -70,10 +70,10 @@ impl Dummy<Faker> for ContestChoice {
 
 #[derive(Serialize, Debug)]
 pub struct DecodedContestVote {
-    is_explicit_invalid: bool,
-    choices: Vec<DecodedVoteChoice>,
+    pub is_explicit_invalid: bool,
+    pub choices: Vec<DecodedVoteChoice>,
     #[serde(serialize_with = "DecodedContestVote::to_id")]
-    contest: Contest,
+    pub contest: Contest,
 }
 
 impl DecodedContestVote {
@@ -108,13 +108,30 @@ impl DecodedContestVote {
 pub struct DecodedVoteChoice {
     #[serde(serialize_with = "DecodedVoteChoice::to_id")]
     // The choice that was made
-    contest_choice: ContestChoice,
+    pub contest_choice: ContestChoice,
     // The number of votes that were assigned, in plurality at large this is always
     // 0 or 1
-    selected: u64,
+    pub selected: u64,
 }
 
 impl DecodedVoteChoice {
+    pub fn get_vote_choice_by_id(
+        id: i64,
+        contest_choices: Vec<ContestChoice>,
+        selected: u64,
+    ) -> Self {
+        let contest_choice: ContestChoice = contest_choices
+            .iter()
+            .find(|cc| cc.id == id)
+            .unwrap()
+            .clone();
+
+        Self {
+            contest_choice,
+            selected,
+        }
+    }
+
     pub fn to_id<S>(contest_choice: &ContestChoice, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -123,26 +140,26 @@ impl DecodedVoteChoice {
     }
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct ContestResult {
-    contest: Contest,
-    total_valid_votes: i64,
+    pub contest: Contest,
+    pub total_valid_votes: i64,
     // For this exercise a vote is invalid if:
     // DecodedContestVote::is_explicit_invalid is set to true, or
     // The number of selected choices does not comply with Contest::min/max_choices
-    total_invalid_votes: i64,
+    pub total_invalid_votes: i64,
     // The counts per choice
-    results: Vec<ContestChoiceResult>,
+    pub results: Vec<ContestChoiceResult>,
     // The winners for the contest (see Contest:num_winners)
-    winners: Vec<ContestChoice>,
+    pub winners: Vec<ContestChoice>,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct ContestChoiceResult {
-    contest_result: ContestResult,
-    contest_choice: ContestChoice,
-    total_count: u64,
+    // pub contest_result: ContestResult,
+    pub contest_choice: ContestChoice,
+    pub total_count: u64,
     // If a winner, the position of this choice (eg 1st, 2nd), otherwise 0
     // Ties are handled by using duplicates, eg 1st, 1st, 3rd..
-    winner_position: u64,
+    pub winner_position: u64,
 }
