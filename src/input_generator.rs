@@ -2,7 +2,7 @@ use crate::voting::{Contest, DecodedContestVote};
 use fake::{Fake, Faker};
 use rand::Rng;
 use serde::Serialize;
-use std::fs;
+use std::{fs, path::PathBuf};
 
 #[derive(Serialize)]
 struct InputJson {
@@ -10,17 +10,17 @@ struct InputJson {
     votes: Vec<DecodedContestVote>,
 }
 
-pub fn generate_input() {
+pub fn generate_input(file: PathBuf) {
     let contest = generate_contest();
     let votes = generate_votes(&contest, contest.get_district_magnitude().unwrap());
 
     let input = InputJson { contest, votes };
     let json_data = serde_json::to_string(&input).expect("Failed to serialize contest");
 
-    let filename = "input.json";
+    let filename = file.to_str().unwrap();
     fs::write(filename, json_data).expect("Unable to write input data into file");
 
-    println!("Generated input.json")
+    println!("Generated {filename}")
 }
 
 fn generate_contest() -> Contest {

@@ -1,6 +1,8 @@
-mod voting;
 mod input_generator;
 mod tally;
+mod voting;
+
+use std::path::PathBuf;
 
 use clap::{Parser, ValueEnum};
 
@@ -21,6 +23,10 @@ struct Cli {
     /// Please select a command
     #[arg(value_enum)]
     command: Command,
+
+    /// Input (Generate) or Output (Tally) file
+    #[arg(short, long)]
+    file: PathBuf,
 }
 
 fn main() {
@@ -28,7 +34,7 @@ fn main() {
 
     match cli.command {
         Command::Generate => {
-            generate_input();
+            generate_input(cli.file);
         }
         Command::Tally => {
             println!("tally!");
