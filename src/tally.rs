@@ -22,8 +22,8 @@ impl Dummy<Faker> for Contest {
         let id = Fake::fake_with_rng::<i64, _>(&(1..9999), rng);
         let description = Words(3..5).fake::<Vec<String>>().join(" ");
         let tally_type = "plurality-at-large".into();
-        let district_magnitude = Fake::fake_with_rng::<i64, _>(&(1..10), rng);
-        let choices: Vec<ContestChoice> = (0..district_magnitude).map(|_| Faker.fake()).collect();
+        let district_magnitude = Fake::fake_with_rng::<i64, _>(&(1..5), rng);
+        let choices: Vec<ContestChoice> = (district_magnitude..50).map(|_| Faker.fake()).collect();
 
         Self {
             id,
