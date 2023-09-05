@@ -1,4 +1,4 @@
-use crate::tally::{Contest, ContestChoice, DecodedContestVote};
+use crate::tally::{Contest, DecodedContestVote};
 use fake::{Fake, Faker};
 use rand::Rng;
 use serde::Serialize;

@@ -78,11 +78,20 @@ pub struct DecodedContestVote {
 
 impl DecodedContestVote {
     pub fn dummy(contest: Contest, district_magnitude: u64) -> Self {
+        let mut rng = rand::thread_rng();
+
+        let choices: Vec<_> = contest
+            .choices
+            .choose_multiple(&mut rng, district_magnitude as usize)
+            .map(|choice| DecodedVoteChoice {
+                contest_choice: choice.clone(),
+                selected: 1,
+            })
+            .collect();
+
         Self {
             is_explicit_invalid: false,
-            choices: (0..district_magnitude)
-                .map(|_| DecodedVoteChoice::dummy(&contest.choices))
-                .collect(),
+            choices,
             contest,
         }
     }
@@ -106,16 +115,6 @@ pub struct DecodedVoteChoice {
 }
 
 impl DecodedVoteChoice {
-    pub fn dummy(contest_choices: &Vec<ContestChoice>) -> Self {
-        Self {
-            contest_choice: contest_choices
-                .choose(&mut rand::thread_rng())
-                .unwrap()
-                .clone(),
-            selected: 1,
-        }
-    }
-
     pub fn to_id<S>(contest_choice: &ContestChoice, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
