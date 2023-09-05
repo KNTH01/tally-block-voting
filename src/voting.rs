@@ -156,7 +156,7 @@ pub struct ContestResult {
 
 #[derive(Serialize, Debug, Clone)]
 pub struct ContestChoiceResult {
-    // pub contest_result: ContestResult,
+    // pub contest_result: ContestResult, // commented because this causes infinite loop
     pub contest_choice: ContestChoice,
     pub total_count: u64,
     // If a winner, the position of this choice (eg 1st, 2nd), otherwise 0

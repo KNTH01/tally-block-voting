@@ -107,8 +107,14 @@ fn create_contest_results(votes: Vec<DecodedContestVote>, contest: &Contest) -> 
         .cloned()
         .collect::<Vec<_>>();
 
+    let mut prev_max_count = results[0].total_count + 1;
+    let mut position = 0;
     for (i, _winner) in winners.iter().enumerate() {
-        results[i].winner_position = (i + 1) as u64;
+        if results[i].total_count != prev_max_count {
+            position += 1;
+            prev_max_count = results[i].total_count;
+        }
+        results[i].winner_position = position;
     }
 
     ContestResult {
@@ -130,7 +136,6 @@ struct InputJson {
 pub struct DecodedVoteChoiceId {
     is_explicit_invalid: bool,
     choices: Vec<DecodedContestVoteId>,
-    contest: i64,
 }
 
 #[derive(Deserialize, Debug)]
