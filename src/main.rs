@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use clap::{Parser, ValueEnum};
+
 struct Contest {
     id: i64,
     description: String,
@@ -54,7 +56,32 @@ struct ContestChoiceResult {
     winner_position: u64,
 }
 
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+enum Command {
+    /// Generates random input data for the purpose of tallying
+    Generate,
+
+    /// Process tally block voting
+    Tally,
+}
+
+#[derive(Parser)]
+#[command(author, version, about, long_about = None)]
+struct Cli {
+    /// Please select a command
+    #[arg(value_enum)]
+    command: Command,
+}
 
 fn main() {
-    println!("Hello, world!");
+    let cli = Cli::parse();
+
+    match cli.command {
+        Command::Generate => {
+            println!("generate")
+        }
+        Command::Tally => {
+            println!("tally!");
+        }
+    }
 }
