@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.4.2", features = ["derive"] }
+fake = { version = "2.8.0", features = ["derive", "uuid"] }
+rand = "0.8.5"
+serde = { version = "1.0.188", features = ["derive"] }
