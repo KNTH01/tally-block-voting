@@ -1,5 +1,5 @@
 mod input_generator;
-mod tally;
+mod voting;
 
 use clap::{Parser, ValueEnum};
 
