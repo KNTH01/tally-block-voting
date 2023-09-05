@@ -15,11 +15,12 @@ pub fn generate_input() {
     let votes = generate_votes(&contest, contest.get_district_magnitude().unwrap());
 
     let input = InputJson { contest, votes };
-
     let json_data = serde_json::to_string(&input).expect("Failed to serialize contest");
 
-    let filename = "contest.json";
+    let filename = "input.json";
     fs::write(filename, json_data).expect("Unable to write input data into file");
+
+    println!("Generated input.json")
 }
 
 fn generate_contest() -> Contest {

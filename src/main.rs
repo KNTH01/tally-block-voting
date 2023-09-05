@@ -1,5 +1,6 @@
-mod input_generator;
 mod voting;
+mod input_generator;
+mod tally;
 
 use clap::{Parser, ValueEnum};
 
@@ -27,7 +28,6 @@ fn main() {
 
     match cli.command {
         Command::Generate => {
-            println!("generate");
             generate_input();
         }
         Command::Tally => {
