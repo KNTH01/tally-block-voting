@@ -8,7 +8,9 @@ use std::{fs, path::PathBuf};
 pub fn generate_input(file: PathBuf) {
     let generator = DataGenerator {};
     let contest = generator.generate_contest();
-    let votes = generator.generate_votes(&contest, contest.get_district_magnitude().unwrap());
+    let votes = generator
+        .generate_votes(&contest, contest.get_district_magnitude()
+        .expect("This program only implement plurality-at-large vote, so it needs to get a district magnitude"));
 
     let input = InputJson { contest, votes };
     let json_data = serde_json::to_string(&input).expect("Failed to serialize contest");
