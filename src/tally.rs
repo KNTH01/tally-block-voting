@@ -172,6 +172,9 @@ mod tests {
 
         process_tally(input.to_path_buf(), output.to_path_buf());
         assert!(output.exists());
+
+        fs::remove_file(input).expect("Failed to clean up test file");
+        fs::remove_file(output).expect("Failed to clean up test file");
     }
 
     #[test]
