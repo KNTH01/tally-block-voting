@@ -163,3 +163,44 @@ pub struct ContestChoiceResult {
     // Ties are handled by using duplicates, eg 1st, 1st, 3rd..
     pub winner_position: u64,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_district_magnitude() {
+        let contest1 = Contest {
+            id: 1,
+            description: String::from("Contest 1"),
+            tally_type: String::from("plurality-at-large"),
+            num_winners: 2,
+            min_choices: 2,
+            max_choices: 2,
+            choices: vec![],
+        };
+        assert_eq!(contest1.get_district_magnitude(), Some(2));
+
+        let contest2 = Contest {
+            id: 2,
+            description: String::from("Contest 2"),
+            tally_type: String::from("plurality-at-large"),
+            num_winners: 4,
+            min_choices: 2,
+            max_choices: 2,
+            choices: vec![],
+        };
+        assert_eq!(contest2.get_district_magnitude(), None);
+
+        let contest3 = Contest {
+            id: 3,
+            description: String::from("Contest 3"),
+            tally_type: String::from("something-else"),
+            num_winners: 2,
+            min_choices: 2,
+            max_choices: 2,
+            choices: vec![],
+        };
+        assert_eq!(contest3.get_district_magnitude(), None);
+    }
+}
