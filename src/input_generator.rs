@@ -34,3 +34,20 @@ fn generate_votes(contest: &Contest, district_magnitude: u64) -> Vec<DecodedCont
         .map(|_| DecodedContestVote::dummy(contest.clone(), district_magnitude))
         .collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use std::path::Path;
+
+    #[test]
+    fn test_generate_input() {
+        let path = Path::new("test_output.json");
+        generate_input(path.to_path_buf());
+        assert!(path.exists());
+        let data = fs::read_to_string(path).expect("Unable to read file");
+        assert!(!data.is_empty());
+        fs::remove_file(path).expect("Failed to clean up test file");
+    }
+}
