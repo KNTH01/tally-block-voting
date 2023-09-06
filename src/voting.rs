@@ -52,8 +52,8 @@ impl Contest {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ContestChoice {
     pub id: i64,
-    text: String,
-    urls: Vec<String>,
+    pub text: String,
+    pub urls: Vec<String>,
 }
 
 impl Dummy<Faker> for ContestChoice {

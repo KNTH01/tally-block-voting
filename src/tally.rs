@@ -5,8 +5,7 @@ use std::fs;
 use std::{fs::File, io::BufReader, path::PathBuf};
 
 use crate::voting::{
-    Contest, ContestChoice, ContestChoiceResult, ContestResult, DecodedContestVote,
-    DecodedVoteChoice,
+    Contest, ContestChoiceResult, ContestResult, DecodedContestVote, DecodedVoteChoice,
 };
 
 pub fn process_tally(input: PathBuf, output: PathBuf) {
@@ -97,6 +96,10 @@ fn create_contest_results(votes: Vec<DecodedContestVote>, contest: &Contest) -> 
         }
     }
 
+    if total_valid_votes == 0 {
+        panic!("There is no valid votes");
+    }
+
     // sort results with the biggest amount of votes
     results.sort_by(|a, b| b.total_count.cmp(&a.total_count));
 
@@ -130,17 +133,149 @@ fn create_contest_results(votes: Vec<DecodedContestVote>, contest: &Contest) -> 
 #[derive(Deserialize, Debug)]
 struct InputJson {
     contest: Contest,
-    votes: Vec<DecodedVoteChoiceId>,
+    votes: Vec<DecodedContestVoteId>,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct DecodedVoteChoiceId {
+pub struct DecodedContestVoteId {
     is_explicit_invalid: bool,
-    choices: Vec<DecodedContestVoteId>,
+    choices: Vec<DecodedVoteChoiceId>,
 }
 
 #[derive(Deserialize, Debug)]
-struct DecodedContestVoteId {
-    contest_choice: i64, // holds ids
+struct DecodedVoteChoiceId {
+    contest_choice: i64,
     selected: u64,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{data_generator::generate_input, voting::ContestChoice};
+    use std::{path::Path, vec};
+
+    #[test]
+    #[should_panic]
+    fn test_read_invalid_input_file() {
+        let path = Path::new("test-abc.json");
+        read_input(path.to_path_buf());
+    }
+
+    #[test]
+    fn test_read_input_output_files() {
+        let input = Path::new("testing-input.json");
+        let output = Path::new("testing-output.json");
+
+        generate_input(input.to_path_buf());
+        assert!(input.exists());
+
+        process_tally(input.to_path_buf(), output.to_path_buf());
+        assert!(output.exists());
+    }
+
+    #[test]
+    fn test_count_votes() {
+        let district_magnitude = 3;
+
+        let choices: Vec<ContestChoice> = (1..=6)
+            .map(|i| ContestChoice {
+                id: i,
+                text: i.to_string(),
+                urls: vec![],
+            })
+            .collect();
+
+        let contest = Contest {
+            id: 1,
+            description: "Bonjour !".into(),
+            tally_type: "plurality-at-large".into(),
+            num_winners: district_magnitude,
+            min_choices: district_magnitude,
+            max_choices: district_magnitude,
+            choices,
+        };
+
+        let vote1 = DecodedContestVoteId {
+            is_explicit_invalid: false,
+            choices: vec![
+                DecodedVoteChoiceId {
+                    contest_choice: 1,
+                    selected: 1,
+                },
+                DecodedVoteChoiceId {
+                    contest_choice: 2,
+                    selected: 1,
+                },
+                DecodedVoteChoiceId {
+                    contest_choice: 3,
+                    selected: 1,
+                },
+            ],
+        };
+
+        let vote2 = DecodedContestVoteId {
+            is_explicit_invalid: false,
+            choices: vec![
+                DecodedVoteChoiceId {
+                    contest_choice: 1,
+                    selected: 1,
+                },
+                DecodedVoteChoiceId {
+                    contest_choice: 2,
+                    selected: 1,
+                },
+                DecodedVoteChoiceId {
+                    contest_choice: 4,
+                    selected: 1,
+                },
+            ],
+        };
+
+        let vote3 = DecodedContestVoteId {
+            is_explicit_invalid: false,
+            choices: vec![
+                DecodedVoteChoiceId {
+                    contest_choice: 1,
+                    selected: 1,
+                },
+                DecodedVoteChoiceId {
+                    contest_choice: 2,
+                    selected: 1,
+                },
+                DecodedVoteChoiceId {
+                    contest_choice: 4,
+                    selected: 1,
+                },
+            ],
+        };
+
+        let votes = vec![vote1, vote2, vote3];
+
+        let input = InputJson {
+            contest: contest.clone(),
+            votes,
+        };
+
+        let cr = count_votes(&input);
+
+        assert_eq!(cr.contest.id, contest.id);
+        assert_eq!(cr.total_valid_votes, 3);
+        assert_eq!(cr.total_invalid_votes, 0);
+
+        // assert winner contest_choice
+        let winner_ids = vec![1, 2, 4];
+        for w in &cr.winners {
+            assert!(winner_ids.iter().any(|id| *id == w.id));
+        }
+
+        // assert winner_position
+        assert_eq!(
+            cr.results
+                .iter()
+                .take(3)
+                .map(|res| res.winner_position)
+                .collect::<Vec<u64>>(),
+            vec![1, 1, 3]
+        );
+    }
 }
