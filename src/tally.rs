@@ -82,18 +82,19 @@ fn create_contest_results(votes: Vec<DecodedContestVote>, contest: &Contest) -> 
 
     let mut results: Vec<ContestChoiceResult> = vec![];
     for (choice_id, count) in &choice_count {
-        let choice: ContestChoice = contest
+        let choice = contest
             .choices
             .iter()
             .find(|choice| choice.id == *choice_id)
-            .cloned()
-            .unwrap();
+            .cloned();
 
-        results.push(ContestChoiceResult {
-            contest_choice: choice,
-            total_count: *count,
-            winner_position: 0, // init winner_position to 0
-        });
+        if let Some(choice) = choice {
+            results.push(ContestChoiceResult {
+                contest_choice: choice,
+                total_count: *count,
+                winner_position: 0, // init winner_position to 0
+            });
+        }
     }
 
     // sort results with the biggest amount of votes
