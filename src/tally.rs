@@ -115,10 +115,11 @@ fn create_contest_results(votes: Vec<DecodedContestVote>, contest: &Contest) -> 
     let mut position = 0;
     for (i, _winner) in winners.iter().enumerate() {
         if results[i].total_count != prev_max_count {
-            position += 1;
+            position += 2;
             prev_max_count = results[i].total_count;
         }
-        results[i].winner_position = position;
+
+        results[i].winner_position = position - 1;
     }
 
     ContestResult {
@@ -267,6 +268,14 @@ mod tests {
         for w in &cr.winners {
             assert!(winner_ids.iter().any(|id| *id == w.id));
         }
+
+        println!(
+            "{:?}",
+            cr.results
+                .iter()
+                .map(|res| res.winner_position)
+                .collect::<Vec<u64>>()
+        );
 
         // assert winner_position
         assert_eq!(
