@@ -1,4 +1,4 @@
-mod input_generator;
+mod data_generator;
 mod tally;
 mod voting;
 
@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 use clap::{Parser, ValueEnum};
 
-use crate::{input_generator::generate_input, tally::process_tally};
+use crate::{data_generator::generate_input, tally::process_tally};
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 enum Command {
