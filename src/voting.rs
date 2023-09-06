@@ -68,7 +68,7 @@ impl Dummy<Faker> for ContestChoice {
     }
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Clone, Debug)]
 pub struct DecodedContestVote {
     pub is_explicit_invalid: bool,
     pub choices: Vec<DecodedVoteChoice>,
@@ -104,7 +104,7 @@ impl DecodedContestVote {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct DecodedVoteChoice {
     #[serde(serialize_with = "DecodedVoteChoice::to_id")]
     // The choice that was made
